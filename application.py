@@ -33,12 +33,6 @@ def index():
     if reg_form.validate_on_submit():
         username = reg_form.username.data
         password = reg_form.password.data
-
-        #  check if username exists
-        user_object = User.query.filter_by(username=username).first()
-        
-        if user_object:
-            return "Username taken"
         
         # Add user
         user = User(username=username, password=password)

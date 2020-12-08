@@ -1,8 +1,10 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 
+from models import User
+
 # input required: cant leave blank, what length for field, if not identical error
-from wtforms.validators import InputRequired, Length, EqualTo
+from wtforms.validators import InputRequired, Length, EqualTo, ValidationError
 
 class RegistrationForm(FlaskForm):
     """ Registration form """
@@ -22,4 +24,10 @@ class RegistrationForm(FlaskForm):
         validators=[InputRequired(message="Password required"),
         EqualTo('password', message="Passwords must match")])
     submit_button = SubmitField('Create')
+
+    def validate_username(self, username):
+        #  check if duplicate
+        user_object = User.query.filter_by(username=username.data).first()
+        if user_object:
+            raise ValidationError("Username already exists. Select another.")
 
