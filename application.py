@@ -1,6 +1,6 @@
 import os
 
-rom flask import Flask, render_template, url_for, redirect, flash
+from flask import Flask, render_template, url_for, redirect, flash
 from time import localtime, strftime
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 
