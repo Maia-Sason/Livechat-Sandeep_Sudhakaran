@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, redirect
+from flask import Flask, render_template, url_for, redirect, flash
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 
 # import model of db from models.py
@@ -52,6 +52,10 @@ def index():
         user = User(username=username, password=hashed_pswd)
         db.session.add(user)
         db.session.commit()
+
+        # Flask built in message flashing system
+        flash('Registered successfully. Please login.', 'success')
+
         return redirect(url_for('login'))
 
 
@@ -76,16 +80,19 @@ def login():
     return render_template("login.html", form=login_form)
 
 @app.route("/chat", methods=['GET', 'POST'])
-@login_required
 def chat():
-    
+    if not current_user.is_authenticated:
+        flash('Please login.', 'danger')
+        return redirect(url_for('login'))
+
     return "Chat here."
 
 @app.route("/logout", methods=['GET'])
 def logout():
 
     logout_user()
-    return "Logged out"
+    flash('Logged out successfully', "success")
+    return redirect(url_for('login'))
 
 
 # when run from terminal python will always validate this condition
