@@ -1,4 +1,6 @@
-from flask import Flask, render_template, url_for, redirect, flash
+import os
+
+rom flask import Flask, render_template, url_for, redirect, flash
 from time import localtime, strftime
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 
@@ -18,7 +20,7 @@ app = Flask(__name__)
 
 # Configure db
 # We need to tell flask the location of db we will access and mod
-app.config['SQLALCHEMY_DATABASE_URI']='postgres://tqhtmhdvlrvncj:409dab96337fd78dea74bf6d1367818c04f803b89e5f614a2e89c729b9ad83e5@ec2-34-192-122-0.compute-1.amazonaws.com:5432/d8gh9apsp8ul1n'
+app.config['SQLALCHEMY_DATABASE_URI']=os.environ.get('DATABASE_URL')
 db = SQLAlchemy(app)
 
 # Configure flask login
@@ -26,7 +28,7 @@ login = LoginManager(app)
 login.init_app(app)
 
 # create secret key to keep client session secure, cookies during sess
-app.secret_key = 'replace'
+app.secret_key = os.environ.get("SECRET")
 
 # Instantiate Flask-socket io and pass in app.
 socketio = SocketIO(app)
@@ -138,4 +140,4 @@ def leave(data):
 # to be true
 # updated for socketio
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    app.run()
