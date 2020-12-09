@@ -1,4 +1,5 @@
 from flask import Flask, render_template, url_for, redirect
+from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 
 # import model of db from models.py
 from models import *
@@ -15,8 +16,18 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI']='postgres://tqhtmhdvlrvncj:409dab96337fd78dea74bf6d1367818c04f803b89e5f614a2e89c729b9ad83e5@ec2-34-192-122-0.compute-1.amazonaws.com:5432/d8gh9apsp8ul1n'
 db = SQLAlchemy(app)
 
+# Configure flask login
+login = LoginManager(app)
+login.init_app(app)
+
 # create secret key to keep client session secure, cookies during sess
 app.secret_key = 'replace'
+
+#  user loader function
+@login.user_loader
+def load_user(id):
+
+    return User.query.get(int(id))
 
 # decorator is activate symbol
 @app.route('/', methods=['GET', 'POST'])
@@ -55,9 +66,27 @@ def login():
 
     # if success, login
     if login_form.validate_on_submit():
-        return "Logged in."
+        user_object = User.query.filter_by(username=login_form.username.data).first()
+        login_user(user_object)
+        # current user is proxy for user_object, is_authenticated came with
+        # UserMixin
+        return redirect(url_for('chat'))
+        
     
     return render_template("login.html", form=login_form)
+
+@app.route("/chat", methods=['GET', 'POST'])
+@login_required
+def chat():
+    
+    return "Chat here."
+
+@app.route("/logout", methods=['GET'])
+def logout():
+
+    logout_user()
+    return "Logged out"
+
 
 # when run from terminal python will always validate this condition
 # to be true
