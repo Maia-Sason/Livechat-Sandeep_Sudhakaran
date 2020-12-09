@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, url_for, redirect
 
 # import model of db from models.py
 from models import *
@@ -33,17 +33,28 @@ def index():
     if reg_form.validate_on_submit():
         username = reg_form.username.data
         password = reg_form.password.data
-        
+
         # Add user
         user = User(username=username, password=password)
         db.session.add(user)
         db.session.commit()
-        return "Inserted to DB"
+        return redirect(url_for('login'))
 
 
     # when installing flask, it installs Jinja
     # reusable templates for web app.
     return render_template("index.html", form=reg_form)
+
+@app.route("/login", methods=['GET', 'POST'])
+def login():
+
+    login_form = LoginForm()
+
+    # if success, login
+    if login_form.validate_on_submit():
+        return "Logged in."
+    
+    return render_template("login.html", form=login_form)
 
 # when run from terminal python will always validate this condition
 # to be true

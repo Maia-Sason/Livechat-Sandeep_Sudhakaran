@@ -1,10 +1,22 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 
-from models import User
-
 # input required: cant leave blank, what length for field, if not identical error
 from wtforms.validators import InputRequired, Length, EqualTo, ValidationError
+
+from models import User
+
+def invalid_credentials(form, field):
+    """ username and password checker """
+    
+
+    username_entered = form.username.data
+    password_entered = field.data
+
+    user_object = User.query.filter_by(username=username_entered).first()
+
+    if user_object is None or password_entered != user_object.password:
+        raise ValidationError("Username or password is incorrect")
 
 class RegistrationForm(FlaskForm):
     """ Registration form """
@@ -31,3 +43,13 @@ class RegistrationForm(FlaskForm):
         if user_object:
             raise ValidationError("Username already exists. Select another.")
 
+ 
+class LoginForm(FlaskForm):
+    """ login """
+
+    username = StringField('username_label', validators=[InputRequired(message="must submit")])
+
+    password = PasswordField('password_label',
+    validators=[InputRequired(message="Must input"),
+    invalid_credentials])
+    submit_button = SubmitField('Submit')
