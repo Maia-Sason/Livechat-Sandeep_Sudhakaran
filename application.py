@@ -30,7 +30,6 @@ login.init_app(app)
 # create secret key to keep client session secure, cookies during sess
 app.secret_key = os.environ.get("SECRET")
 
-
 # Instantiate Flask-socket io and pass in app.
 socketio = SocketIO(app)
 
@@ -80,8 +79,6 @@ def index():
 @app.route("/login", methods=['GET', 'POST'])
 def login():
 
-    session.clear()
-
     login_form = LoginForm()
 
     # if success, login
@@ -90,7 +87,6 @@ def login():
         login_user(user_object)
         # current user is proxy for user_object, is_authenticated came with
         # UserMixin
-        session[user_object]
         return redirect(url_for('chat'))
         
     
@@ -144,4 +140,4 @@ def leave(data):
 # to be true
 # updated for socketio
 if __name__ == '__main__':
-    app.run(debug = False)
+    app.run(debug=False)
