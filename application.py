@@ -1,6 +1,8 @@
 import os
 
-from flask import Flask, render_template, url_for, redirect, flash
+from flask import Flask, render_template, url_for, redirect, flash, session
+from flask_session import Session
+from tempfile import mkdtemp
 from time import localtime, strftime
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 
@@ -28,13 +30,20 @@ login = LoginManager(app)
 login.init_app(app)
 
 # create secret key to keep client session secure, cookies during sess
-app.secret_key = os.environ.get("SECRET")
+# app.secret_key = os.environ.get("SECRET")
+app.secret_key = "replace"
 
 # Instantiate Flask-socket io and pass in app.
 socketio = SocketIO(app)
 
 # initialize list of rooms
 ROOMS = ["lounge", "news", "games", "coding"]
+
+# config sessions
+app.config["SESSION_FILE_DIR"] = mkdtemp()
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
 
 #  user loader function
 @login.user_loader
@@ -79,6 +88,8 @@ def index():
 @app.route("/login", methods=['GET', 'POST'])
 def login():
 
+    session.clear()
+
     login_form = LoginForm()
 
     # if success, login
@@ -87,6 +98,7 @@ def login():
         login_user(user_object)
         # current user is proxy for user_object, is_authenticated came with
         # UserMixin
+        session[user_object]
         return redirect(url_for('chat'))
         
     
@@ -102,6 +114,8 @@ def chat():
 
 @app.route("/logout", methods=['GET'])
 def logout():
+
+    session.clear()
 
     logout_user()
     flash('Logged out successfully', "success")
@@ -140,4 +154,4 @@ def leave(data):
 # to be true
 # updated for socketio
 if __name__ == '__main__':
-    app.run()
+    app.run(debug = False)
