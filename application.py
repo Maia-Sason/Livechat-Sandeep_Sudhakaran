@@ -1,8 +1,6 @@
 import os
 
-from flask import Flask, render_template, url_for, redirect, flash, session
-from flask_session import Session
-from tempfile import mkdtemp
+from flask import Flask, render_template, url_for, redirect, flash
 from time import localtime, strftime
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 
@@ -30,20 +28,14 @@ login = LoginManager(app)
 login.init_app(app)
 
 # create secret key to keep client session secure, cookies during sess
-# app.secret_key = os.environ.get("SECRET")
-app.secret_key = "replace"
+app.secret_key = os.environ.get("SECRET")
+
 
 # Instantiate Flask-socket io and pass in app.
 socketio = SocketIO(app)
 
 # initialize list of rooms
 ROOMS = ["lounge", "news", "games", "coding"]
-
-# config sessions
-app.config["SESSION_FILE_DIR"] = mkdtemp()
-app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
-Session(app)
 
 #  user loader function
 @login.user_loader
@@ -114,8 +106,6 @@ def chat():
 
 @app.route("/logout", methods=['GET'])
 def logout():
-
-    session.clear()
 
     logout_user()
     flash('Logged out successfully', "success")
