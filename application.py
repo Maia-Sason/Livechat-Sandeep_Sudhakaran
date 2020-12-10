@@ -6,7 +6,7 @@ from flask_login import LoginManager, login_user, current_user, login_required, 
 
 # socket io
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
-
+# comment
 
 # import model of db from models.py
 from models import *
